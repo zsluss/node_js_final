@@ -142,7 +142,12 @@ const addStateFunfact = async (req, res) => {
         }
         
         const result = await state.save();
-        res.status(201).json(result);
+        res.status(201).json({
+            _id: result._id,
+            state: result.state,
+            code: result.code,
+            funfacts: result.funfacts
+        });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -209,7 +214,12 @@ const deleteStateFunfact = async (req, res) => {
 
         state.funfacts.splice(factIndex, 1);
         const result = await state.save();
-        res.json(result);
+        res.json({
+            _id: result._id,
+            state: result.state,
+            code: result.code,
+            funfacts: result.funfacts
+        });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
