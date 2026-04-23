@@ -173,6 +173,35 @@ const updateStateFunfact = async (req, res) => {
     }
 }
 
+const deleteStateFunfact = async (req, res) => {
+    const code = req.stateCode;
+    const stateData = findStateByCode(code);
+    const { index } = req.body || {};
+
+    if (!index) {
+        return res.status(400).json({ message: 'State fun fact index value required' });
+    }
+
+    try {
+        const state = await State.findOne({ code });
+
+        if (!state?.funfacts?.length) {
+            return res.status(404).json({ message: `No Fun Facts found for ${stateData.state}` });
+        }
+
+        const factIndex = Number(index) - 1;
+        if (!Number.isInteger(Number(index)) || factIndex < 0 || factIndex >= state.funfacts.length) {
+            return res.status(400).json({ message: `No Fun Fact found at that index for ${stateData.state}` });
+        }
+
+        state.funfacts.splice(factIndex, 1);
+        const result = await state.save();
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+}
+
 module.exports = {
     getAllStates,
     getState,
@@ -182,5 +211,6 @@ module.exports = {
     getStatePopulation,
     getStateAdmission,
     addStateFunfact,
-    updateStateFunfact
+    updateStateFunfact,
+    deleteStateFunfact
 }
