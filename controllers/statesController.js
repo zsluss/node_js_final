@@ -75,8 +75,7 @@ const getStateFunfacts = async (req, res) => {
             return res.status(404).json({ 'message': `No Fun Facts found for ${stateData.state}` });
         }
 
-        const randomIndex = Math.floor(Math.random() * state.funfacts.length);
-        res.json({ funfact: state.funfacts[randomIndex] });
+        res.json({ funfacts: state.funfacts });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
