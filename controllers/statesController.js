@@ -113,8 +113,16 @@ const getStateAdmission = (req, res) => {
 const addStateFunfact = async (req, res) => {
     const code = req.stateCode;
 
-    if (!req?.body?.funfacts || !Array.isArray(req.body.funfacts) || req.body.funfacts.length === 0) {
-        return res.status(400).json({ 'message': 'funfacts array with at least one item is required.' });
+    if (!req?.body?.funfacts) {
+        return res.status(400).json({ 'message': 'State fun facts value required' });
+    }
+
+    if (!Array.isArray(req.body.funfacts)) {
+        return res.status(400).json({ 'message': 'State fun facts value must be an array' });
+    }
+
+    if (req.body.funfacts.length === 0) {
+        return res.status(400).json({ 'message': 'State fun facts value required' });
     }
 
     try {
