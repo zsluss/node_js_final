@@ -10,7 +10,8 @@ router.route('/')
 
 router.route('/:state/funfact')
     .get(statesController.getStateFunfacts)
-    .post(statesController.addStateFunfact);
+    .post(statesController.addStateFunfact)
+    .patch(statesController.updateStateFunfact);
 
 router.route('/:state/capital')
     .get(statesController.getStateCapital);

@@ -3,7 +3,6 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const cors = require('cors');
-const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const connectDB = require('./config/dbConn');
 const PORT = process.env.PORT || 3500;
@@ -20,8 +19,6 @@ app.use(express.urlencoded({ extended: false }));
 // built-in middleware for json 
 app.use(express.json());
 
-// middleware for cookies
-app.use(cookieParser());
 
 //serve static files
 app.use('/', express.static(path.join(__dirname, '/public')));

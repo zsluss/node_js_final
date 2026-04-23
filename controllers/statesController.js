@@ -17,7 +17,7 @@ const getStateWithFunfacts = async (code) => {
     return stateData;
 };
 
-const getAllStates = (req, res) => {
+const getAllStates = async (req, res) => {
     const { contig } = req.query;
     let result = [...states];
 
@@ -28,7 +28,28 @@ const getAllStates = (req, res) => {
     }
 
     result.sort((a, b) => a.state.localeCompare(b.state));
-    res.json(result);
+
+    try {
+        const mongoStates = await State.find(
+            { code: { $in: result.map((state) => state.code) } },
+            { code: 1, funfacts: 1, _id: 0 }
+        ).lean();
+
+        const funfactsByCode = new Map(
+            mongoStates
+                .filter((state) => Array.isArray(state.funfacts) && state.funfacts.length)
+                .map((state) => [state.code, state.funfacts])
+        );
+
+        const merged = result.map((state) => {
+            const funfacts = funfactsByCode.get(state.code);
+            return funfacts ? { ...state, funfacts } : state;
+        });
+
+        res.json(merged);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
 }
 
 const getState = async (req, res) => {
@@ -119,6 +140,39 @@ const addStateFunfact = async (req, res) => {
     }
 }
 
+const updateStateFunfact = async (req, res) => {
+    const code = req.stateCode;
+    const stateData = findStateByCode(code);
+    const { index, funfact } = req.body || {};
+
+    if (!index) {
+        return res.status(400).json({ message: 'State fun fact index value required' });
+    }
+
+    if (!funfact) {
+        return res.status(400).json({ message: 'State fun fact value required' });
+    }
+
+    try {
+        const state = await State.findOne({ code });
+
+        if (!state?.funfacts?.length) {
+            return res.status(404).json({ message: `No Fun Facts found for ${stateData.state}` });
+        }
+
+        const factIndex = Number(index) - 1;
+        if (!Number.isInteger(Number(index)) || factIndex < 0 || factIndex >= state.funfacts.length) {
+            return res.status(400).json({ message: `No Fun Fact found at that index for ${stateData.state}` });
+        }
+
+        state.funfacts[factIndex] = funfact;
+        const result = await state.save();
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+}
+
 module.exports = {
     getAllStates,
     getState,
@@ -127,5 +181,6 @@ module.exports = {
     getStateNickname,
     getStatePopulation,
     getStateAdmission,
-    addStateFunfact
+    addStateFunfact,
+    updateStateFunfact
 }
