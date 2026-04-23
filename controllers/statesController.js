@@ -100,7 +100,7 @@ const getStatePopulation = (req, res) => {
     const code = req.stateCode;
     const state = findStateByCode(code);
 
-    res.json({ state: state.state, population: state.population });
+    res.json({ state: state.state, population: state.population.toLocaleString() });
 }
 
 const getStateAdmission = (req, res) => {
