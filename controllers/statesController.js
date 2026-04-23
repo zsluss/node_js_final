@@ -175,7 +175,12 @@ const updateStateFunfact = async (req, res) => {
 
         state.funfacts[factIndex] = funfact;
         const result = await state.save();
-        res.json(result);
+        res.json({
+            _id: result._id,
+            state: result.state,
+            code: result.code,
+            funfacts: result.funfacts
+        });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
