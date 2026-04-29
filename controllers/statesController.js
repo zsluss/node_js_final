@@ -10,9 +10,11 @@ const getStateWithFunfacts = async (code) => {
     if (!stateData) return null;
 
     const mongoState = await State.findOne({ code }).lean();
-    const funfacts = Array.isArray(mongoState?.funfacts) ? mongoState.funfacts : [];
+    if (mongoState) {
+        return { ...stateData, funfacts: mongoState.funfacts ?? [] };
+    }
 
-    return { ...stateData, funfacts };
+    return stateData;
 };
 
 const getAllStates = async (req, res) => {
